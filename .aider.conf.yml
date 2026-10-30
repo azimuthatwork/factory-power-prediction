@@ -1,0 +1,22 @@
+model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
+# editor-model:  openrouter/nvidia/nemotron-3.5-lightning:free
+
+dirty-commits: false
+# Use the OpenAI-compatible provider prefix for local llama.cpp
+# model: openai/qwen2.5-7B-instruct
+
+# Point Aider to your local llama.cpp server endpoint
+# openai-api-base: http://localhost:8080/v1
+
+# llama.cpp doesn't require a real key, but Aider/LiteLLM expects a non-empty string
+# openai-api-key: dummy-key
+
+edit-format: diff
+stream: true
+auto-commits: true
+git: true
+restore-chat-history: true
+pretty:  false 
+map-tokens: 2048
+# edit-format: whole
+map-refresh: auto
