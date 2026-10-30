@@ -76,6 +76,17 @@ def main() -> None:
         peak_time_str=peak_time.strftime("%a %H:%M")
     )
 
+    # Compute baseline for future period (seasonal naive: same hour last week)
+    # We need 7 days (168 hours) of history before the future period starts
+    baseline_future = None
+    if len(df) >= 168:
+        baseline_future = df[target].iloc[-168:].values  # last 168 hours = same hours 1 week ago
+        if len(baseline_future) > len(future):
+            baseline_future = baseline_future[-len(future):]
+        elif len(baseline_future) < len(future):
+            # Pad if needed (shouldn't happen with 24h forecast and 60 days history)
+            baseline_future = np.pad(baseline_future, (0, len(future) - len(baseline_future)), mode='edge')
+
     # Forecast chart
     st.markdown(f"### Forecast view — {target}")
     hist_view = df.tail(7 * 24)
@@ -87,7 +98,9 @@ def main() -> None:
         low_band=low_band,
         high_band=high_band,
         last_timestamp=df["timestamp"].iloc[-1],
-        last_value=df[target].iloc[-1]
+        last_value=df[target].iloc[-1],
+        baseline=baseline_future,
+        baseline_label="Seasonal Naive (Baseline)"
     )
 
     # Backtest and checklist

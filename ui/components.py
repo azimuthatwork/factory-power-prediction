@@ -74,9 +74,11 @@ def render_forecast_chart(
     low_band: np.ndarray,
     high_band: np.ndarray,
     last_timestamp: pd.Timestamp,
-    last_value: float
+    last_value: float,
+    baseline: np.ndarray | None = None,
+    baseline_label: str = "Seasonal Naive (Baseline)"
 ) -> None:
-    """Render forecast chart with history, forecast, and uncertainty band."""
+    """Render forecast chart with history, forecast, baseline, and uncertainty band."""
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=hist_view["timestamp"], y=hist_view[target], mode="lines",
@@ -89,6 +91,14 @@ def render_forecast_chart(
         x=forecast_x, y=forecast_y, mode="lines+markers", name="Forecast",
         line=dict(color="#e67e22", width=3, dash="dash"), marker=dict(size=5)
     ))
+    # Baseline comparison (seasonal naive)
+    if baseline is not None:
+        baseline_x = [last_timestamp, *future["timestamp"].tolist()]
+        baseline_y = [float(last_value), *baseline.tolist()]
+        fig.add_trace(go.Scatter(
+            x=baseline_x, y=baseline_y, mode="lines+markers", name=baseline_label,
+            line=dict(color="#2ca02c", width=2, dash="dot"), marker=dict(size=4)
+        ))
     fig.add_trace(go.Scatter(
         x=list(future["timestamp"]) + list(future["timestamp"][::-1]),
         y=list(high_band) + list(low_band[::-1]), fill="toself",
@@ -105,7 +115,8 @@ def render_forecast_chart(
     st.plotly_chart(fig, use_container_width=True)
     st.caption(
         "The shaded band is based on historical validation residuals; "
-        "it is an illustrative uncertainty range, not a formally calibrated prediction interval."
+        "it is an illustrative uncertainty range, not a formally calibrated prediction interval. "
+        "Green dotted line = seasonal naive baseline (same hour last week)."
     )
 
 
