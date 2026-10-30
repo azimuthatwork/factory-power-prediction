@@ -1,4 +1,1 @@
--r requirements.txt
-# Optional CPU-only educational temporal Transformer model
-# PyTorch installation can be large; see https://pytorch.org/get-started/locally/
-torch>=2.3,<3
+torch>=2.0
